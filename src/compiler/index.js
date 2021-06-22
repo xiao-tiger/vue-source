@@ -6,6 +6,9 @@ export function compileToFunctions(template) {
 
   // 通过这个树，重新生成代码  生成一个 render 函数
   const code = generate(ast)
-  console.log(code, 'code')
-
+  const render = `with (this) {
+    return ${code}
+  }`
+  const renderFn = new Function(render)
+  return renderFn
 }
