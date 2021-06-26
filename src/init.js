@@ -1,5 +1,6 @@
 import { initState } from './initState'
 import { compileToFunctions } from './compiler/index'
+import { mountComponent } from './lifecycle'
 
 
 export function initMixin (Vue) {
@@ -37,5 +38,8 @@ export function initMixin (Vue) {
         options.render = render
       }
     }
+
+    // 将当前的实例挂载到 el 上面去
+    mountComponent(vm, el)
   }
 }
