@@ -20,9 +20,10 @@ function path (oldVnode, vnode) {
 }
 
 function createEle (vnode) {
-  const { tag, key, data, children, text } = vnode
+  const { tag, children, text } = vnode
   if (typeof tag === 'string') {
     vnode.el = document.createElement(tag)
+    updateProperties(vnode)
     children.forEach((child) => {
       vnode.el.appendChild(createEle(child))
     })
@@ -33,11 +34,23 @@ function createEle (vnode) {
   return vnode.el
 }
 
+function updateProperties (vnode) {
+  const { data = {}, el } = vnode
+  for (let key in data) {
+    if (key === 'style') {
+      for (let styleName in data[key]) {
+        el.style[styleName] = data[key][styleName]
+      }
+    } else {
+      el.setAttribute(key, data[key])
+    }
+  }
+}
 
 
 export function mountComponent (vm, el) {
 
 
-  // 调用 render 方法创建 虚拟节点，再将虚拟节点渲染到页面上  Vue核心再次
+  // 调用 render 方法创建 虚拟节点，再将虚拟节点渲染到页面上  Vue核心在次
   vm._update(vm._render())
 }
