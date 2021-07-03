@@ -38,6 +38,7 @@ export function initMixin (Vue) {
         options.render = render
       }
     }
+    vm.$el = el
 
     // 将当前的实例挂载到 el 上面去
     mountComponent(vm, el)
