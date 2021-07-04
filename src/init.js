@@ -1,7 +1,7 @@
 import { initState } from './initState'
 import { compileToFunctions } from './compiler/index'
 import { mountComponent } from './lifecycle'
-import { mergeOptions } from './util/index'
+import { callHook, mergeOptions } from './util/index'
 
 
 export function initMixin (Vue) {
@@ -10,9 +10,12 @@ export function initMixin (Vue) {
 
     // vm.$options = options
     vm.$options = mergeOptions(vm.constructor.options, options)  // 当前组件的options和传入组件的options
+    callHook(vm, 'beforeCreate')
 
     // 数据初始化，对数据进行劫持，这样当数据发生变化的时候，可以通知视图更新
     initState(vm)
+
+    callHook(vm, 'created')
 
     // 如果当前有 el 属性说明要渲染模板
     if (vm.$options.el) {

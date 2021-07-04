@@ -66,3 +66,12 @@ export function mergeOptions (parent, child) {
 
   return options
 }
+
+export function callHook (vm, hook) {
+  const handler = vm.$options[hook]
+  if (handler) {
+    for (let i = 0; i < handler.length; i++) {
+      handler[i].call(vm)
+    }
+  }
+}
