@@ -13,14 +13,26 @@
   </div>
   <script src="./dist/umd/vue.js"></script>
   <script>
+
+    Vue.mixin({
+      created () {
+        console.log('mixin---')
+      }
+    })
+
     const vm = new Vue({
       el: '#app',
       data () {
         return {
           name: [1, 2, 3]
         }
+      },
+      created () {
+        console.log('cdsc')
       }
     })
+
+
   </script>
 </body>
 </html>

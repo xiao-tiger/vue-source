@@ -1,13 +1,15 @@
 import { initState } from './initState'
 import { compileToFunctions } from './compiler/index'
 import { mountComponent } from './lifecycle'
+import { mergeOptions } from './util/index'
 
 
 export function initMixin (Vue) {
   Vue.prototype._init = function (options) {
     const vm = this
 
-    vm.$options = options
+    // vm.$options = options
+    vm.$options = mergeOptions(vm.constructor.options, options)  // 当前组件的options和传入组件的options
 
     // 数据初始化，对数据进行劫持，这样当数据发生变化的时候，可以通知视图更新
     initState(vm)
