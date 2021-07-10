@@ -1,4 +1,5 @@
 import { callHook } from "./util/index"
+import Watcher from "./observer/watcher"
 
 export function lifecycleMixin (Vue) {
   Vue.prototype._update = function (vnode) {
@@ -54,7 +55,13 @@ export function mountComponent (vm, el) {
 
   callHook(vm, 'beforeMount')
   // 调用 render 方法创建 虚拟节点，再将虚拟节点渲染到页面上  Vue核心在次
-  vm._update(vm._render())
+
+  const updateComponent = () => {
+    vm._update(vm._render())
+  }
+  new Watcher(vm, updateComponent, () => {
+    callHook(vm, 'beforeUpdate')
+  }, true)
 
   callHook(vm, 'mounted')
 }

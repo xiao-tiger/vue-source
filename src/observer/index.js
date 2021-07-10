@@ -1,4 +1,5 @@
 import { arrayMethods } from './array'
+import Dep from './dep'
 
 function observer (data) {
   if (typeof data !== 'object' || data === null) return
@@ -51,17 +52,23 @@ class Observer {
 function defineReactive (obj, key, value) {
   // 如果value也是对象的话，我们也需要监测
   observer(value)
+
+  const dep = new Dep()
+
   Object.defineProperty(obj, key, {
     get () {
-      console.log('取值')
+      if (Dep.target) {
+        dep.depend()
+      }
       return value
     },
     set (newValue) {
       if (newValue === value) return
       // 如果我们设置的 newValue 也是对象的话，我们也需要监测
-      console.log('set')
       observer(newValue)
       value = newValue
+
+      dep.notify()
     }
   })
 }
