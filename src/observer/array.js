@@ -9,13 +9,13 @@ const methods = ['push', 'shift', 'unshift', 'pop', 'splice', 'reverse', 'sort']
 
 
 methods.forEach(method => {
-  arrayMethods[methods] = function (...args) {
+  arrayMethods[method] = function (...args) {
 
     // 当前的 this 就是  data.__proto__ = arrayMethods 中的 data
     let inserted = null
     let ob = this.__ob__
 
-    switch (methods) {
+    switch (method) {
       case 'push':
       case 'unshift':
         inserted = args
@@ -32,7 +32,9 @@ methods.forEach(method => {
     // 重写一个，那好low啊，源码是定义了一个不可枚举的 __ob__ 属性，指向 Observer 实例
     if (inserted) ob.observerArray(inserted)
 
-    const result = oldArrayProtoMethods[methods].apply(this, args)
+    const result = oldArrayProtoMethods[method].apply(this, args)
+
+    ob.dep.notify()   // 通知数组更新
     return result
   }
 })

@@ -4,13 +4,18 @@ import Dep from './dep'
 function observer (data) {
   if (typeof data !== 'object' || data === null) return
 
-  new Observer(data)
+  if (data.__ob__) return
+
+  return new Observer(data)
 }
 
 // 观测值
 class Observer {
   constructor (data) {
     // data 只能是 []  {}
+
+    // 给对象加上 dep 属性，这样数组就可以拿到dep属性了
+    this.dep = new Dep()
 
     // 给所有响应式数据增加标识，并且可以在响应式上获取Observer实例上的方法
     // 不可枚举  将当前 实例 this 绑定到 data对象中
@@ -51,14 +56,22 @@ class Observer {
 
 function defineReactive (obj, key, value) {
   // 如果value也是对象的话，我们也需要监测
-  observer(value)
+  // 数组对应的dep  （可能是数组、对象，属性肯定没有）
+  const childDep = observer(value)
 
+  // 每个属性都有一个依赖
   const dep = new Dep()
 
+  // 当页面取值的时候，说明这个值用来渲染，将这个 watcher 和这个属性对应起来
+  // watcher 已经存放在 Dep.target 上面去了
   Object.defineProperty(obj, key, {
     get () {
       if (Dep.target) {
-        dep.depend()
+        dep.depend()  // 让这个属性记住 watcher
+        if (childDep) {
+          // 数组存起来了这个渲染 watcher
+          childDep.dep.depend()
+        }
       }
       return value
     },
