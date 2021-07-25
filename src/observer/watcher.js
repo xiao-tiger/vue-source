@@ -1,4 +1,4 @@
-import Dep, { pushTarget, popTarget } from './dep'
+import { pushTarget, popTarget } from './dep'
 
 
 let id = 0
@@ -32,8 +32,15 @@ class Watcher {
     popTarget()
   }
 
+  run () {
+    this.get()
+  }
+
   update () {
-    this.get()  // 重新渲染
+    // 每次更新都会调用 get 方法，我们将其缓存起来，执行性一个 get
+    // this.get()  // 重新渲染
+
+    queueWatcher(this)
   }
 
   addDep (dep) {
@@ -42,6 +49,33 @@ class Watcher {
       this.deps.push(dep)
       this.depsId.add(id)
       dep.addSub(this)
+    }
+  }
+}
+
+let queue = []
+let has = {}
+let pending = false
+function queueWatcher (watcher) {
+  const id = watcher.id  // 标识每个 watcher 的 id
+  console.log(watcher.id)
+  if (!has[id]) {
+    // 将需要批量更新的 watcher（根据 watcher id 去重） 存到一个队列中，稍后让 watcher 执行
+    // 这样就可以做到 批量更新 只更新一次
+    queue.push(watcher)
+    has[id] = true
+
+    // 这里我们去调用  vm.update(vm.render()) 方法
+    // 但是我们可以等待所有同步操作结束，再去异步的更新dom，执行所有的watcher
+    // 防抖
+    if (!pending) {
+      setTimeout(() => {
+        queue.forEach(watcher => watcher.run())
+        queue = []
+        has = {}
+        pending = false
+      }, 0)
+      pending = true
     }
   }
 }

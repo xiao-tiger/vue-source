@@ -37,7 +37,10 @@
     })
 
     setTimeout(() => {
+      // 批处理  vue的异步更新，不然每次更新数据，就去update，太消耗性能了
       vm.age = 34
+      vm.name.push('xxxx')
+      vm.name.push('xxxx')
       vm.name.push('xxxx')
       // vm._update(vm._render())
 

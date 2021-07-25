@@ -62,7 +62,7 @@ export function mountComponent (vm, el) {
   
   // 初始化的时候，就会创建 watcher  这个 watcher 是 渲染watcher
   new Watcher(vm, updateComponent, () => {
-    callHook(vm, 'beforeUpdate')
+    callHook(vm, 'updated')
   }, true)  // 渲染 watcher
 
   callHook(vm, 'mounted')
