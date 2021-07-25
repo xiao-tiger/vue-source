@@ -1,4 +1,5 @@
 import { pushTarget, popTarget } from './dep'
+import { nextTick } from '../util/index'
 
 
 let id = 0
@@ -56,9 +57,17 @@ class Watcher {
 let queue = []
 let has = {}
 let pending = false
+
+function flushSchedulerQueue () {
+  queue.forEach(watcher => { watcher.run(); watcher.cb() })
+  queue = []
+  has = {}
+  pending = false
+}
+
+
 function queueWatcher (watcher) {
   const id = watcher.id  // 标识每个 watcher 的 id
-  console.log(watcher.id)
   if (!has[id]) {
     // 将需要批量更新的 watcher（根据 watcher id 去重） 存到一个队列中，稍后让 watcher 执行
     // 这样就可以做到 批量更新 只更新一次
@@ -69,12 +78,14 @@ function queueWatcher (watcher) {
     // 但是我们可以等待所有同步操作结束，再去异步的更新dom，执行所有的watcher
     // 防抖
     if (!pending) {
-      setTimeout(() => {
-        queue.forEach(watcher => watcher.run())
-        queue = []
-        has = {}
-        pending = false
-      }, 0)
+      // 抽离异步更新方法
+      nextTick(flushSchedulerQueue)
+      // setTimeout(() => {
+      //   queue.forEach(watcher => watcher.run())
+      //   queue = []
+      //   has = {}
+      //   pending = false
+      // }, 0)
       pending = true
     }
   }

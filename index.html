@@ -33,6 +33,9 @@
       },
       mounted () {
         console.log('mounted')
+      },
+      updated () {
+        console.log('updated')
       }
     })
 
@@ -42,6 +45,11 @@
       vm.name.push('xxxx')
       vm.name.push('xxxx')
       vm.name.push('xxxx')
+
+      vm.$nextTick(() => {
+        console.log('更新结束---')
+      })
+
       // vm._update(vm._render())
 
       // 数据变化要自动去调用 vm._update(vm._render())

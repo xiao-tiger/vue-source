@@ -2,6 +2,7 @@ import { initMixin } from './init'
 import { lifecycleMixin } from './lifecycle'
 import { renderMixin } from './vdom/index'
 import { initGlobalApi } from './global-api/index'
+import { stateMixin } from './initState'
 
 function Vue (options) {
   // 入口， 初始化options数据
@@ -13,7 +14,7 @@ function Vue (options) {
 initMixin(Vue)
 lifecycleMixin(Vue)
 renderMixin(Vue)
-
+stateMixin(Vue)
 
 // 静态方法 Vue.extend  Vue.mixin  Vue.component  Vue.directive
 initGlobalApi(Vue)

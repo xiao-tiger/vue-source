@@ -1,4 +1,5 @@
 import observer from './observer/index'
+import { nextTick } from "./util/index";
 
 function proxy (vm, data, key) {
   Object.defineProperty(vm, key, {
@@ -51,3 +52,9 @@ function initData (vm) {
 function initWatch () {}
 function initComputed () {}
 function initMethods () {}
+
+export function stateMixin (Vue) {
+  Vue.prototype.$nextTick = function (cb) {
+    nextTick(cb)
+  }
+}

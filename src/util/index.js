@@ -75,3 +75,49 @@ export function callHook (vm, hook) {
     }
   }
 }
+
+let callbacks = []
+let pending = false
+
+function flushCallbacks () {
+  // while (callbacks.length) {
+  //   const cb = callbacks.pop()
+  //   cb()
+  // }
+  callbacks.forEach(cb => cb())
+  callbacks = []
+  pending = false
+}
+
+let timerFunc
+
+if (Promise) {
+  timerFunc = () => {
+    Promise.resolve().then(flushCallbacks)  // 异步处理更新
+  }
+} else if (setImmediate) {
+  setImmediate(flushCallbacks)
+} else if (MutationObserver) {
+  const observer = new MutationObserver(flushCallbacks)
+  const textNode = document.createTextNode(1)
+  observer.observe(textNode, {
+    characterData: true
+  })
+  timerFunc = () => {
+    textNode.textContent = 2
+  }
+
+} else {
+  setTimeout(flushCallbacks)
+}
+
+export function nextTick (cb) {
+  callbacks.push(cb)
+
+  // 用户也会调用一次 $nextTick ，程序内部肯定会调用一次 nextTick ，但异步只需要一次，
+  // 内部 => 用户手动调用 (执行顺序)
+  if (!pending) {
+    timerFunc()  // 这个方法是异步的，做了一层兼容处理，vue3就全部使用 promise
+    pending = true
+  }
+}
