@@ -14,8 +14,8 @@ const strats = {}
 strats.data = function (parentValue, childValue) {
   return childValue
 }
-strats.watch = function () {}
-strats.computed = function () {}
+// strats.watch = function () {}
+// strats.computed = function () {}
 
 function mergeHook (parentValue, childValue) {
   // 第一次传参肯定是 undefined, xxx

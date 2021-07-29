@@ -28,6 +28,15 @@
           age: 23
         }
       },
+      watch: {
+        age: {
+          handler (newValue, oldValue) {
+            console.log(newValue, oldValue, '--watch---')
+          },
+          deep: true,
+          immediate: true
+        } 
+      },
       created () {
         console.log('cdsc')
       },

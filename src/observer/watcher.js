@@ -16,25 +16,47 @@ class Watcher {
     this.cb = cb
     this.options = options
     this.id = id++  // watcher 的唯一标识
-
+    this.user = !!options.user
     this.deps = []  // 记录有多少 dep 依赖 watcher
     this.depsId = new Set()
 
     if (typeof exprOrFn === 'function') {
       this.getter = exprOrFn
+    } else {
+      // watch 监听 字符串
+      this.getter = function () {
+        // 'a.b.c'
+        const path = exprOrFn.split('.')
+        let obj = vm
+        for (let i = 0; i < path.length; i++) {
+          obj = obj[path[i]]  // vm.a.b.c
+        }
+        return obj
+      }
     }
-    this.get()
+    // 默认会调用一次 get 方法，进行取值，将结果保留下来
+    this.value = this.get()
   }
 
   get () {
     // 页面渲染的时候，会走 get 方法，收集依赖，属性对应一个 Watcher 实例
     pushTarget(this)
-    this.getter()
+    const result = this.getter()
     popTarget()
+
+    // 返回值 result 就是监听器的 hander 的 newValue
+    return result
   }
 
   run () {
-    this.get()
+    const newValue = this.get()
+    const oldValue = this.value
+
+    if (this.user) {
+      this.cb.call(this.vm, newValue, oldValue)
+
+      this.value = newValue
+    }
   }
 
   update () {
@@ -59,7 +81,13 @@ let has = {}
 let pending = false
 
 function flushSchedulerQueue () {
-  queue.forEach(watcher => { watcher.run(); watcher.cb() })
+  queue.forEach(watcher => { 
+    watcher.run()
+    // 渲染 watcher 是用于更新dom，用户自定义 watcher 是用来操作 cb
+    if (!watcher.user) {
+      watcher.cb() 
+    }
+  })
   queue = []
   has = {}
   pending = false
